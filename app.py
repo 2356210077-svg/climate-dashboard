@@ -56,19 +56,19 @@ st.markdown("""
     h1 { color: white !important; } /* Phần chữ thường trong H1 */
     p, div, span, li, label, .stMarkdown { color: #E0E6ED; }
 
-    /* --- FIX LỖI "KEYBOARD..." (QUAN TRỌNG) --- */
+    /* --- FIX LỖI "KEYBOARD..." (LÀM TRONG SUỐT) --- */
     
-    /* 1. Làm cho nút sidebar và chữ bên trong trở nên TRONG SUỐT */
+    /* 1. Biến chữ lỗi thành trong suốt */
     [data-testid="stSidebarCollapsedControl"] {
         color: transparent !important;
         background-color: transparent !important;
     }
     
-    /* 2. Vẽ mũi tên mới đè lên (Màu xanh ngọc) */
+    /* 2. Vẽ đè mũi tên mới (➤) lên vị trí đó */
     [data-testid="stSidebarCollapsedControl"]::after {
         content: "➤";
         font-size: 24px !important;
-        color: #00F260 !important; /* Màu mũi tên */
+        color: #00F260 !important; /* Màu xanh ngọc */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -202,12 +202,16 @@ with st.sidebar:
     st.caption("Thao tác: Di chuột vào biểu đồ để xem chi tiết.")
     
     st.markdown("---")
+    
+    # --- ĐOẠN CODE ĐÃ SỬA THEO YÊU CẦU CỦA BẠN ---
     st.markdown("""
         <div style='font-size: 20px; font-weight: 900; background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
-    st.caption("Dự án Phân tích Dữ liệu Quản lý 2025")
+    # ---------------------------------------------
+    
+    st.caption("Dự án Phân tích Dữ liệu cho Quản lý 2025")
 
 # ==========================================
 # 5. UI: HEADER CHÍNH
@@ -236,7 +240,7 @@ if not city_data.empty:
     # KPI Row
     kpi1, kpi2, kpi3 = st.columns(3)
     with kpi1:
-        st.metric("Nhiệt độ TB (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
+        st.metric("Nhiệt độ Trung bình (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
     with kpi2:
         st.metric("Cao nhất lịch sử", f"{stats['max']:.1f}°C")
     with kpi3:
@@ -336,3 +340,4 @@ with tab2:
             st.plotly_chart(fig_fc, use_container_width=True)
     else:
         st.warning("⚠️ Chưa tải được dữ liệu dự báo.")
+
