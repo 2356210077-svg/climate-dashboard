@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go 
+import streamlit.components.v1 as components # Thư viện để nhúng bản đồ
 
 # ==========================================
 # 1. CẤU HÌNH TRANG
@@ -10,12 +11,11 @@ import plotly.graph_objects as go
 st.set_page_config(
     layout="wide", 
     page_title="Climate Analytics Hub",
-    page_icon="🌏",
-    initial_sidebar_state="expanded"
+    page_icon=None
 )
 
 # ==========================================
-# 2. CSS SỬA LỖI MẠNH TAY & GIAO DIỆN ĐÊM
+# 2. CSS CAO CẤP (GIỮ NGUYÊN GIAO DIỆN ĐẸP)
 # ==========================================
 st.markdown("""
     <style>
@@ -29,72 +29,69 @@ st.markdown("""
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
+    /* Lớp phủ tối (90%) */
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(5, 10, 20, 0.9); 
+        background: rgba(2, 6, 15, 0.92); 
         z-index: -1;
     }
 
-    /* --- FONT CHỮ NỘI DUNG --- */
-    /* Chỉ áp dụng font đẹp cho nội dung chính */
-    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stMetricLabel, .stMetricValue, .stDataFrame {
-        font-family: 'Be Vietnam Pro', sans-serif !important;
-        color: #FFFFFF !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    /* --- FONT CHỮ & MÀU SẮC --- */
+    * { font-family: 'Be Vietnam Pro', sans-serif !important; }
+    
+    h1, h2, h3, strong {
+        background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
     }
-    
-    /* --- KHẮC PHỤC LỖI "KEYBOARD..." (GIẢI PHÁP MẠNH TAY) --- */
-    
-    /* 1. Làm chữ icon hệ thống trở nên trong suốt (không nhìn thấy) */
-    button, [data-testid="stSidebarCollapsedControl"] {
-        color: transparent !important; 
+    p, span, div, label, li { color: #E0E6ED; }
+
+    /* --- FIX LỖI ICON --- */
+    button, i, span, [data-testid="stSidebarCollapsedControl"] {
+        font-family: sans-serif !important;
     }
-    
-    /* 2. Vẽ một mũi tên giả đè lên nút Sidebar để thay thế */
     [data-testid="stSidebarCollapsedControl"]::after {
-        content: "➤"; /* Mũi tên đơn giản an toàn tuyệt đối */
-        color: #00F4B0; /* Màu xanh neon */
-        font-size: 20px;
+        content: "➤";
+        color: #33FFBB;
+        font-size: 24px;
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        font-family: sans-serif; /* Dùng font mặc định của máy để không bao giờ lỗi */
     }
-    
-    /* 3. Ẩn icon lỗi trong Expander */
+    [data-testid="stSidebarCollapsedControl"] { color: transparent !important; }
     .streamlit-expanderHeader svg { display: none !important; }
-    .streamlit-expanderHeader { padding-left: 1rem !important; }
 
-    /* --- GIAO DIỆN --- */
-    /* Tiêu đề Xanh Neon */
-    h1, h2, h3, strong { color: #00F4B0 !important; }
-    
-    /* Chữ thường */
-    p, label, li, .stCaption { color: #E2E8F0 !important; }
-
-    /* Metric Card */
+    /* --- GIAO DIỆN CARD & IFRAME --- */
     div[data-testid="stMetric"] {
-        background-color: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(0, 244, 176, 0.3);
-        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(51, 255, 187, 0.3);
+        border-radius: 15px;
         padding: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
     }
-    div[data-testid="stMetricValue"] { font-size: 38px !important; font-weight: 700; color: #FFFFFF !important; }
-    div[data-testid="stMetricLabel"] { color: #94A3B8 !important; }
+    div[data-testid="stMetricLabel"] { color: #94A3B8 !important; font-size: 14px !important; text-transform: uppercase; }
+    div[data-testid="stMetricValue"] { font-size: 40px !important; font-weight: 800; background: linear-gradient(90deg, #FFFFFF 0%, #D1D5DB 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     /* Sidebar */
-    [data-testid="stSidebar"] { 
-        background-color: #020617 !important; 
-        border-right: 1px solid rgba(255, 255, 255, 0.1); 
-    }
+    [data-testid="stSidebar"] { background-color: #020617 !important; border-right: 1px solid rgba(255, 255, 255, 0.05); }
     
     /* Expander */
     .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #00F4B0 !important;
+        color: #33FFBB !important;
+        padding-left: 20px !important;
+    }
+    
+    /* Style cho khung bản đồ */
+    iframe {
+        border-radius: 15px;
+        border: 1px solid rgba(51, 255, 187, 0.3);
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -103,7 +100,7 @@ st.markdown("""
 # 3. HÀM XỬ LÝ DỮ LIỆU
 # ==========================================
 @st.cache_data
-def load_data(filepath='city_temperatures_clean.zip'):
+def load_data(filepath='city_temperatures_clean.csv'): 
     try:
         df = pd.read_csv(filepath)
     except FileNotFoundError:
@@ -119,6 +116,8 @@ def load_data(filepath='city_temperatures_clean.zip'):
             df['Temperature_C'] = (df['AvgTemperature'] - 32) * 5/9
         else:
             df['Temperature_C'] = df['AvgTemperature']
+            
+        df = df.rename(columns={'Date': 'Ngày', 'Temperature_C': 'Nhiệt độ (°C)', 'City': 'Thành phố', 'Country': 'Quốc gia'})
     return df
 
 @st.cache_resource
@@ -140,7 +139,8 @@ df = load_data()
 model_global = load_model()
 global_data = load_global_data()
 if df.empty: st.stop()
-unique_cities = sorted(df['City'].unique())
+
+unique_cities = sorted(df['Thành phố'].unique())
 
 # ==========================================
 # 4. UI: SIDEBAR
@@ -152,7 +152,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("""
-        <div style="color: #00F4B0; font-weight: bold; font-size: 18px;">
+        <div class='gradient-text' style='font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
@@ -162,9 +162,9 @@ with st.sidebar:
 # 5. UI: HEADER CHÍNH
 # ==========================================
 st.markdown(f"""
-    <h1>CLIMATE ANALYTICS <span style='color:#FFFFFF'>HUB</span></h1>
+    <h1>CLIMATE ANALYTICS <span>HUB</span></h1>
     <p style='font-size: 18px; color: #CBD5E1; margin-top: 5px;'>
-        Báo cáo phân tích dữ liệu chuyên sâu cho <strong style='color: #00F4B0'>{selected_city}</strong>
+        Báo cáo phân tích dữ liệu chuyên sâu cho <strong>{selected_city}</strong>
     </p>
     <br>
 """, unsafe_allow_html=True)
@@ -172,16 +172,18 @@ st.markdown(f"""
 # ==========================================
 # 6. DASHBOARD THÀNH PHỐ
 # ==========================================
-city_data = df[df['City'] == selected_city].copy()
+city_data = df[df['Thành phố'] == selected_city].copy()
 
 if not city_data.empty:
-    stats = city_data['Temperature_C'].describe()
-    chart_data = city_data.set_index('Date')['Temperature_C'].resample('Y').mean().reset_index()
-    current_temp = chart_data.iloc[-1]['Temperature_C']
+    # KPI
+    stats = city_data['Nhiệt độ (°C)'].describe()
+    chart_data = city_data.set_index('Ngày')['Nhiệt độ (°C)'].resample('Y').mean().reset_index()
+    current_temp = chart_data.iloc[-1]['Nhiệt độ (°C)']
     delta = 0
     if len(chart_data) > 1:
-        delta = current_temp - chart_data.iloc[-2]['Temperature_C']
+        delta = current_temp - chart_data.iloc[-2]['Nhiệt độ (°C)']
 
+    # KPI Row
     kpi1, kpi2, kpi3 = st.columns(3)
     with kpi1:
         st.metric("Nhiệt độ TB (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
@@ -192,21 +194,35 @@ if not city_data.empty:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("### Xu hướng Nhiệt độ")
+    # --- [MỚI] BẢN ĐỒ VỆ TINH ---
+    # Nhúng Google Maps chế độ vệ tinh (t=k) vào iframe
+    st.markdown("### 🗺️ Vị trí Địa lý")
+    
+    # Tạo link Google Maps Embed tự động theo tên thành phố
+    # t=k: Satellite mode (Vệ tinh) -> Nhìn cực ngầu trên nền tối
+    map_url = f"https://maps.google.com/maps?q={selected_city}&t=k&z=12&ie=UTF8&iwloc=&output=embed"
+    
+    # Hiển thị bản đồ full chiều rộng
+    components.iframe(map_url, height=400, scrolling=False)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    # -----------------------------
+
+    st.markdown("### 📈 Xu hướng Nhiệt độ")
     
     fig = px.area(
-        chart_data, x='Date', y='Temperature_C',
+        chart_data, x='Ngày', y='Nhiệt độ (°C)',
         template='plotly_dark',
-        color_discrete_sequence=['#00F4B0']
+        color_discrete_sequence=['#33FFBB']
     )
     
     fig.update_layout(
-        paper_bgcolor='rgba(15, 23, 42, 0.6)', # Nền mờ nhẹ hơn
+        paper_bgcolor='rgba(15, 23, 42, 0.8)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_family="Be Vietnam Pro",
         hovermode="x unified",
-        xaxis=dict(showgrid=False, title="", showticklabels=True),
-        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)', title="Độ C", zeroline=False),
+        xaxis=dict(showgrid=False, title=""),
+        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)', title="Độ C"),
         margin=dict(l=20, r=20, t=20, b=20),
         height=450
     )
@@ -215,7 +231,7 @@ if not city_data.empty:
 
     with st.expander("Xem bảng dữ liệu chi tiết"):
         st.dataframe(
-            city_data[['Date', 'Temperature_C']].style.format({"Temperature_C": "{:.2f}"}), 
+            city_data[['Ngày', 'Nhiệt độ (°C)']].style.format({"Nhiệt độ (°C)": "{:.2f}"}), 
             use_container_width=True
         )
 
@@ -223,16 +239,18 @@ if not city_data.empty:
 # 7. PHẦN DỰ BÁO
 # ==========================================
 st.markdown("---")
-st.markdown("## Phân tích & Dự báo AI")
+st.markdown("## 🔮 Phân tích & Dự báo AI")
 
 tab1, tab2 = st.tabs(["Dữ liệu Lịch sử", "Mô hình Dự báo"])
 
 with tab1:
     if global_data is not None:
-        fig_global = px.line(global_data, template='plotly_dark')
-        fig_global.update_traces(line_color='#00A3FF', line_width=3)
+        global_viz = global_data.copy()
+        global_viz.name = "Nhiệt độ TB (°C)"
+        fig_global = px.line(global_viz, template='plotly_dark')
+        fig_global.update_traces(line_color='#00B4FF', line_width=3)
         fig_global.update_layout(
-            paper_bgcolor='rgba(15, 23, 42, 0.6)',
+            paper_bgcolor='rgba(15, 23, 42, 0.8)',
             plot_bgcolor='rgba(0,0,0,0)',
             xaxis_title="", yaxis_title="Độ C", margin=dict(t=20, l=20, r=20, b=20)
         )
@@ -241,7 +259,6 @@ with tab1:
 with tab2:
     if model_global is not None and global_data is not None:
         col_opt, col_chart = st.columns([1, 3])
-        
         with col_opt:
             st.markdown("#### Tham số")
             years = st.slider('Số năm dự báo:', 1, 10, 5)
@@ -252,7 +269,6 @@ with tab2:
             last_date = global_data.index.max()
             idx = pd.date_range(start=last_date + pd.DateOffset(months=1), periods=steps, freq='ME')
             forecast = pd.DataFrame(model_global.forecast(steps), index=idx, columns=['Dự báo'])
-            
             y_hist = global_data.iloc[:, 0] if isinstance(global_data, pd.DataFrame) else global_data
 
             fig_fc = go.Figure()
@@ -262,12 +278,11 @@ with tab2:
             ))
             fig_fc.add_trace(go.Scatter(
                 x=forecast.index, y=forecast['Dự báo'], mode='lines', name='Dự báo AI',
-                line=dict(color='#FF0055', width=3)
+                line=dict(color='#FF006E', width=3)
             ))
-            
             fig_fc.update_layout(
                 template='plotly_dark',
-                paper_bgcolor='rgba(15, 23, 42, 0.6)',
+                paper_bgcolor='rgba(15, 23, 42, 0.8)',
                 plot_bgcolor='rgba(0,0,0,0)',
                 font_family="Be Vietnam Pro",
                 legend=dict(orientation="h", y=1.1),
@@ -276,5 +291,4 @@ with tab2:
             )
             st.plotly_chart(fig_fc, use_container_width=True)
     else:
-
         st.warning("⚠️ Chưa tải được dữ liệu dự báo.")
