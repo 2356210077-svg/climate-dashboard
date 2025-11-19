@@ -202,7 +202,7 @@ with st.sidebar:
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
-    st.caption("Dự án Phân tích Dữ liệu Quản lý 2025")
+    st.caption("Dự án Phân tích Dữ liệu cho Quản lý 2025")
 
 # ==========================================
 # 5. UI: HEADER CHÍNH
@@ -231,7 +231,7 @@ if not city_data.empty:
     # KPI Row - Các thẻ này giờ đây có hiệu ứng 3D khi di chuột
     kpi1, kpi2, kpi3 = st.columns(3)
     with kpi1:
-        st.metric("Nhiệt độ TB (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
+        st.metric("Nhiệt độ Trung bình (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
     with kpi2:
         st.metric("Cao nhất lịch sử", f"{stats['max']:.1f}°C")
     with kpi3:
