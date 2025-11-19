@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. CSS "TRIỆT ĐỂ" (FIX LỖI KEYBOARD BẰNG FONT-SIZE 0)
+# 2. CSS "LUXURY TURQUOISE" (XANH NGỌC + FIX LỖI)
 # ==========================================
 st.markdown("""
     <style>
@@ -34,119 +34,125 @@ st.markdown("""
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(2, 6, 15, 0.92); 
+        background: rgba(3, 12, 28, 0.92); 
         z-index: -1;
     }
 
-    /* --- TYPOGRAPHY (CHỈ ÁP DỤNG CHO VĂN BẢN) --- */
-    /* Thay vì dùng *, ta chỉ định rõ các thẻ chứa chữ để KHÔNG đụng vào Icon */
-    h1, h2, h3, h4, h5, h6, p, label, input, textarea, .stMarkdown, .stMetricLabel, .stMetricValue, .stDataFrame {
-        font-family: 'Be Vietnam Pro', sans-serif !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    }
+    /* --- FONT & TEXT --- */
+    * { font-family: 'Be Vietnam Pro', sans-serif !important; }
 
-    /* --- GRADIENT TEXT --- */
-    h1 span, strong {
+    /* --- GRADIENT XANH NGỌC (TURQUOISE) --- */
+    /* Đây là màu bạn thích: Xanh Ngọc -> Xanh Dương */
+    h1 span, strong, .gradient-text, h2, h3 {
         background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 900 !important;
-    }
-    h1, h2, h3 { color: white !important; }
-    p, div, span, li { color: #E0E6ED; }
-
-    /* --- GIẢI PHÁP MẠNH TAY: FIX LỖI "KEYBOARD..." --- */
-    /* 1. Thu nhỏ font của nút Sidebar về 0 để giấu chữ lỗi */
-    [data-testid="stSidebarCollapsedControl"] {
-        font-size: 0 !important;
-        width: 40px;
-        height: 40px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 25px rgba(51, 255, 187, 0.25); /* Glow nhẹ sang trọng */
     }
     
-    /* 2. Vẽ đè mũi tên mới lên bằng pseudo-element */
-    [data-testid="stSidebarCollapsedControl"]::after {
-        content: "➤"; /* Ký tự mũi tên an toàn */
-        font-size: 24px !important; /* Kích thước mũi tên */
-        color: #33FFBB !important; /* Màu xanh Gradient */
-        display: block;
-        text-align: center;
-        line-height: 40px;
-        cursor: pointer;
-    }
+    h1 { color: white !important; }
+    p, div, span, li, label { color: #E0E6ED; }
 
-    /* Ẩn icon lỗi trong Expander */
+    /* --- FIX LỖI "KEYBOARD..." (TÀNG HÌNH HÓA) --- */
+    /* 1. Làm cho nút sidebar và icon hệ thống trở nên TRONG SUỐT */
+    [data-testid="stSidebarCollapsedControl"] {
+        color: transparent !important;
+        font-size: 0 !important; /* Thu nhỏ về 0 để chắc chắn biến mất */
+        width: 40px; height: 40px;
+        position: relative;
+        z-index: 10000;
+    }
+    
+    /* 2. Vẽ mũi tên mới đè lên (Màu xanh ngọc) */
+    [data-testid="stSidebarCollapsedControl"]::after {
+        content: "➤";
+        font-size: 22px !important;
+        color: #33FFBB !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0; left: 0;
+    }
+    
+    /* 3. Ẩn icon lỗi trong Expander */
     .streamlit-expanderHeader svg { display: none !important; }
     .streamlit-expanderHeader { padding-left: 1rem !important; }
 
-    /* --- 4. GIAO DIỆN BẢNG DỮ LIỆU (DATAFRAME) --- */
-    /* Làm trong suốt nền bảng và chỉnh màu chữ trắng */
-    [data-testid="stDataFrame"], [data-testid="stTable"] {
-        background-color: transparent !important;
+    /* --- CARD KPI (HIỆU ỨNG 3D CHIỀU SÂU & ÁNH SÁNG) --- */
+    div[data-testid="stMetric"] {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(51, 255, 187, 0.3); /* Viền trên sáng xanh ngọc */
+        border-radius: 16px;
+        padding: 15px 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(12px);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+        cursor: pointer;
     }
-    /* Chỉnh màu chữ trong bảng thành trắng */
-    div[data-testid="stDataFrame"] div {
-        color: white !important;
-        background-color: rgba(255, 255, 255, 0.02) !important; /* Nền dòng cực mờ */
+    
+    /* Hiệu ứng khi di chuột (Hover): Nổi lên & Phát sáng viền */
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 15px rgba(51, 255, 187, 0.2); /* Ánh sáng xanh tỏa ra */
+        border-color: rgba(51, 255, 187, 0.6);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
     }
-    /* Header của bảng */
-    div[data-testid="stDataFrame"] div[role="columnheader"] {
-        color: #33FFBB !important; /* Màu xanh cho tiêu đề cột */
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        font-weight: bold;
+    
+    /* Hiệu ứng khi nhấp chuột (Active): Nhấn xuống */
+    div[data-testid="stMetric"]:active {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     }
 
-    /* --- 5. CARD KPI (METRIC) --- */
-    div[data-testid="stMetric"] {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-        border: 1px solid rgba(51, 255, 187, 0.3);
-        border-radius: 15px;
-        padding: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.6);
-        backdrop-filter: blur(10px);
-    }
     div[data-testid="stMetricLabel"] { 
-        color: #94A3B8 !important; 
+        color: #9CA3AF !important; 
         font-size: 13px !important; 
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        -webkit-text-fill-color: #94A3B8 !important; /* Label không gradient */
+        text-transform: uppercase; 
+        letter-spacing: 1.2px;
     }
     div[data-testid="stMetricValue"] { 
-        font-size: 40px !important; 
+        font-size: 42px !important; 
         font-weight: 800;
-        /* Value dùng Gradient */
-        background: linear-gradient(90deg, #FFFFFF 0%, #D1D5DB 100%); 
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #FFFFFF !important;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
-    /* --- 6. SIDEBAR --- */
+    /* --- SIDEBAR & EXPANDER --- */
     [data-testid="stSidebar"] { 
-        background-color: #020617 !important; 
+        background-color: #050C1A !important; 
         border-right: 1px solid rgba(255, 255, 255, 0.05); 
     }
     
-    /* --- 7. KHUNG BẢN ĐỒ & BIỂU ĐỒ --- */
-    iframe {
-        border-radius: 15px;
-        border: 1px solid rgba(51, 255, 187, 0.3);
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
     .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #33FFBB !important; /* Chữ tiêu đề expander màu xanh */
+        background-color: rgba(51, 255, 187, 0.05) !important;
+        border: 1px solid rgba(51, 255, 187, 0.2);
+        color: #33FFBB !important;
+    }
+    
+    /* --- BẢNG DỮ LIỆU --- */
+    [data-testid="stDataFrame"] { background: transparent !important; }
+    
+    /* --- IFRAME BẢN ĐỒ --- */
+    iframe {
+        border-radius: 16px;
+        border: 1px solid rgba(51, 255, 187, 0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     </style>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 3. HÀM XỬ LÝ DỮ LIỆU (ĐỌC FILE ZIP)
+# 3. HÀM XỬ LÝ DỮ LIỆU
 # ==========================================
 @st.cache_data
-def load_data(filepath='city_temperatures_clean.zip'): # <--- ĐÃ ĐỔI THÀNH .ZIP
+def load_data(filepath='city_temperatures_clean.zip'): 
     try:
-        # Pandas tự động giải nén file zip nếu bên trong là csv
         df = pd.read_csv(filepath)
     except FileNotFoundError:
         st.error(f"❌ Lỗi: Không tìm thấy file '{filepath}'.")
@@ -157,13 +163,11 @@ def load_data(filepath='city_temperatures_clean.zip'): # <--- ĐÃ ĐỔI THÀNH
              df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
         df = df.dropna(subset=['AvgTemperature', 'Date', 'City'])
         
-        # Chuyển đổi độ F -> C
         if df['AvgTemperature'].mean() > 60:
             df['Temperature_C'] = (df['AvgTemperature'] - 32) * 5/9
         else:
             df['Temperature_C'] = df['AvgTemperature']
             
-        # Việt hóa tên cột
         df = df.rename(columns={
             'Date': 'Ngày',
             'Temperature_C': 'Nhiệt độ (°C)',
@@ -187,7 +191,7 @@ def load_global_data(path='global_temp_series.pkl'):
     except: return None
 
 # KHỞI TẠO
-df = load_data() # Mặc định sẽ load file .zip
+df = load_data()
 model_global = load_model()
 global_data = load_global_data()
 if df.empty: st.stop()
@@ -204,18 +208,18 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("""
-        <div style='font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        <div style='font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
-    st.caption("Dự án Phân tích Dữ liệu cho Quản lý 2025")
+    st.caption("Dự án Phân tích Dữ liệu Quản lý 2025")
 
 # ==========================================
 # 5. UI: HEADER CHÍNH
 # ==========================================
 st.markdown(f"""
     <h1>CLIMATE ANALYTICS <span>HUB</span></h1>
-    <p style='font-size: 18px; color: #CBD5E1; margin-top: 5px;'>
+    <p style='font-size: 18px; color: #9CA3AF; margin-top: 5px;'>
         Báo cáo phân tích dữ liệu chuyên sâu cho <strong>{selected_city}</strong>
     </p>
     <br>
@@ -234,10 +238,10 @@ if not city_data.empty:
     if len(chart_data) > 1:
         delta = current_temp - chart_data.iloc[-2]['Nhiệt độ (°C)']
 
-    # KPI Row
+    # KPI Row - Hiệu ứng chiều sâu & ánh sáng
     kpi1, kpi2, kpi3 = st.columns(3)
     with kpi1:
-        st.metric("Nhiệt độ Trung bình (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
+        st.metric("Nhiệt độ TB (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
     with kpi2:
         st.metric("Cao nhất lịch sử", f"{stats['max']:.1f}°C")
     with kpi3:
@@ -257,7 +261,7 @@ if not city_data.empty:
     fig = px.area(
         chart_data, x='Ngày', y='Nhiệt độ (°C)',
         template='plotly_dark',
-        color_discrete_sequence=['#33FFBB']
+        color_discrete_sequence=['#33FFBB'] # Màu Xanh Ngọc
     )
     
     fig.update_layout(
@@ -284,7 +288,7 @@ if not city_data.empty:
 # 7. PHẦN DỰ BÁO
 # ==========================================
 st.markdown("---")
-st.markdown("## 🔮 Phân tích & Dự báo AI")
+st.markdown("## Phân tích & Dự báo AI")
 
 tab1, tab2 = st.tabs(["Dữ liệu Lịch sử", "Mô hình Dự báo"])
 
@@ -293,7 +297,7 @@ with tab1:
         global_viz = global_data.copy()
         global_viz.name = "Nhiệt độ TB (°C)"
         fig_global = px.line(global_viz, template='plotly_dark')
-        fig_global.update_traces(line_color='#00B4FF', line_width=3)
+        fig_global.update_traces(line_color='#00B4FF', line_width=3) # Xanh biển
         fig_global.update_layout(
             paper_bgcolor='rgba(15, 23, 42, 0.8)',
             plot_bgcolor='rgba(0,0,0,0)',
