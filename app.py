@@ -100,7 +100,7 @@ st.markdown("""
 # 3. HÀM XỬ LÝ DỮ LIỆU
 # ==========================================
 @st.cache_data
-def load_data(filepath='city_temperatures_clean.csv'): 
+def load_data(filepath='city_temperatures_clean.zip'): 
     try:
         df = pd.read_csv(filepath)
     except FileNotFoundError:
@@ -292,3 +292,4 @@ with tab2:
             st.plotly_chart(fig_fc, use_container_width=True)
     else:
         st.warning("⚠️ Chưa tải được dữ liệu dự báo.")
+
