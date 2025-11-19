@@ -56,32 +56,45 @@ st.markdown("""
     h1 { color: white !important; } /* Phần chữ thường trong H1 */
     p, div, span, li, label, .stMarkdown { color: #E0E6ED; }
 
-    /* --- FIX LỖI "KEYBOARD..." (LÀM TRONG SUỐT) --- */
-    
-    /* 1. Biến chữ lỗi thành trong suốt */
+    /* --- 3. KHẮC PHỤC LỖI "KEYBOARD..." (KỸ THUẬT ZERO SIZE) --- */
+    /* Bước 1: Thu nhỏ font của nút về 0 để giấu chữ lỗi */
     [data-testid="stSidebarCollapsedControl"] {
-        color: transparent !important;
-        background-color: transparent !important;
+        font-size: 0 !important;
+        width: 40px;
+        height: 40px;
     }
     
-    /* 2. Vẽ đè mũi tên mới (➤) lên vị trí đó */
+    /* Bước 2: Vẽ mũi tên mới đè lên bằng pseudo-element */
     [data-testid="stSidebarCollapsedControl"]::after {
-        content: "➤";
-        font-size: 24px !important;
-        color: #00F260 !important; /* Màu xanh ngọc */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0; left: 0;
-        text-shadow: 0 0 10px rgba(0, 242, 96, 0.8);
+        content: "➤"; /* Ký tự mũi tên an toàn */
+        font-size: 24px !important; /* Kích thước mũi tên */
+        color: #33FFBB !important; /* Màu xanh Gradient */
+        display: block;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
     }
-    
-    /* 3. Ẩn icon lỗi trong Expander */
+
+    /* Ẩn icon lỗi trong Expander */
     .streamlit-expanderHeader svg { display: none !important; }
     .streamlit-expanderHeader { padding-left: 1rem !important; }
+
+    /* --- 4. GIAO DIỆN BẢNG DỮ LIỆU (DATAFRAME) --- */
+    /* Làm trong suốt nền bảng và chỉnh màu chữ trắng */
+    [data-testid="stDataFrame"], [data-testid="stTable"] {
+        background-color: transparent !important;
+    }
+    /* Chỉnh màu chữ trong bảng thành trắng */
+    div[data-testid="stDataFrame"] div {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.02) !important; /* Nền dòng cực mờ */
+    }
+    /* Header của bảng */
+    div[data-testid="stDataFrame"] div[role="columnheader"] {
+        color: #33FFBB !important; /* Màu xanh cho tiêu đề cột */
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        font-weight: bold;
+    }
 
     /* --- CARD KPI (HIỆU ỨNG 3D CHIỀU SÂU) --- */
     div[data-testid="stMetric"] {
@@ -340,4 +353,5 @@ with tab2:
             st.plotly_chart(fig_fc, use_container_width=True)
     else:
         st.warning("⚠️ Chưa tải được dữ liệu dự báo.")
+
 
