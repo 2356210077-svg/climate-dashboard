@@ -11,12 +11,12 @@ import streamlit.components.v1 as components
 st.set_page_config(
     layout="wide", 
     page_title="Climate Analytics Hub",
-    page_icon="🌏",
+    page_icon=None,
     initial_sidebar_state="expanded"
 )
 
 # ==========================================
-# 2. CSS "TRIỆT ĐỂ" (FIX LỖI KEYBOARD BẰNG FONT-SIZE 0)
+# 2. CSS "LUXURY" (XANH NGỌC + HIỆU ỨNG CHIỀU SÂU)
 # ==========================================
 st.markdown("""
     <style>
@@ -30,107 +30,119 @@ st.markdown("""
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
-    /* Lớp phủ tối (90%) */
+    /* Lớp phủ tối (Deep Dark) làm nền cho chữ sáng */
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(2, 6, 15, 0.92); 
+        background: rgba(3, 12, 28, 0.93); /* Tối hơn một chút để tăng độ sang */
         z-index: -1;
     }
 
-    /* --- TYPOGRAPHY (CHỈ ÁP DỤNG CHO VĂN BẢN) --- */
-    /* Thay vì dùng *, ta chỉ định rõ các thẻ chứa chữ để KHÔNG đụng vào Icon */
-    h1, h2, h3, h4, h5, h6, p, label, input, textarea, .stMarkdown, .stMetricLabel, .stMetricValue, .stDataFrame {
-        font-family: 'Be Vietnam Pro', sans-serif !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    }
+    /* --- FONT & TEXT --- */
+    * { font-family: 'Be Vietnam Pro', sans-serif !important; }
 
-    /* --- GRADIENT TEXT --- */
-    h1 span, strong {
-        background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%);
+    /* --- GRADIENT XANH NGỌC (TURQUOISE GEM) --- */
+    /* Dải màu từ Xanh Ngọc sáng đến Xanh Biển sâu */
+    h1 span, strong, .gradient-text, h2, h3 {
+        background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); 
+        /* Hoặc thử: linear-gradient(to right, #43cea2, #185a9d); cho màu trầm hơn */
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 900 !important;
-    }
-    h1, h2, h3 { color: white !important; }
-    p, div, span, li { color: #E0E6ED; }
-
-    /* --- GIẢI PHÁP MẠNH TAY: FIX LỖI "KEYBOARD..." --- */
-    /* 1. Thu nhỏ font của nút Sidebar về 0 để giấu chữ lỗi */
-    [data-testid="stSidebarCollapsedControl"] {
-        font-size: 0 !important;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 30px rgba(0, 242, 96, 0.2); /* Glow nhẹ */
     }
     
-    /* 2. Vẽ đè mũi tên mới lên */
-    [data-testid="stSidebarCollapsedControl"]::after {
-        content: "☰"; /* Icon Menu an toàn */
-        font-size: 24px !important;
-        color: #33FFBB !important;
-        font-weight: bold;
-        display: block;
-    }
+    h1 { color: white !important; }
+    p, div, span, li, label { color: #E0E6ED; }
 
-    /* --- FIX LỖI EXPANDER --- */
-    /* Ẩn icon gốc bị lỗi */
-    .streamlit-expanderHeader svg { display: none !important; }
-    
-    /* Vẽ mũi tên giả cho Expander */
-    .streamlit-expanderHeader::before {
-        content: "▼";
-        color: #33FFBB;
-        font-size: 14px;
-        margin-right: 10px;
-        font-family: sans-serif;
-    }
-    .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding-left: 15px !important;
-    }
-
-    /* --- CARD KPI --- */
+    /* --- CARD KPI (HIỆU ỨNG 3D CHIỀU SÂU) --- */
     div[data-testid="stMetric"] {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-        border: 1px solid rgba(51, 255, 187, 0.3);
-        border-radius: 15px;
-        padding: 15px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #00F260; /* Điểm nhấn xanh ngọc bên trái */
+        border-radius: 16px;
+        padding: 15px 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Bóng đổ thường */
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Chuyển động mượt */
         backdrop-filter: blur(10px);
     }
-    div[data-testid="stMetricLabel"] { color: #94A3B8 !important; }
-    div[data-testid="stMetricValue"] { 
-        font-size: 40px !important; 
-        font-weight: 800;
-        background: linear-gradient(90deg, #FFFFFF 0%, #D1D5DB 100%); 
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    
+    /* Hiệu ứng khi di chuột (Hover): Nổi lên & Phát sáng */
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px) scale(1.02); /* Bay lên nhẹ */
+        box-shadow: 0 15px 30px rgba(0, 242, 96, 0.15); /* Bóng đổ xanh ngọc */
+        border-color: rgba(0, 242, 96, 0.5);
+        background: rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+    }
+    
+    /* Hiệu ứng khi nhấp chuột (Active): Nhấn xuống */
+    div[data-testid="stMetric"]:active {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 242, 96, 0.1);
     }
 
-    /* --- SIDEBAR --- */
+    div[data-testid="stMetricLabel"] { 
+        color: #9CA3AF !important; 
+        font-size: 13px !important; 
+        text-transform: uppercase; 
+        letter-spacing: 1.5px;
+        font-weight: 600;
+    }
+    div[data-testid="stMetricValue"] { 
+        font-size: 42px !important; 
+        font-weight: 800;
+        color: #FFFFFF !important;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    /* --- FIX LỖI "KEYBOARD..." (VẪN GIỮ NGUYÊN) --- */
+    [data-testid="stSidebarCollapsedControl"] {
+        font-size: 0 !important;
+        width: 40px; height: 40px;
+    }
+    [data-testid="stSidebarCollapsedControl"]::after {
+        content: "☰"; 
+        font-size: 24px !important;
+        color: #00F260 !important; /* Xanh ngọc */
+        display: block;
+        line-height: 40px;
+        text-align: center;
+    }
+
+    /* --- SIDEBAR & EXPANDER --- */
     [data-testid="stSidebar"] { 
-        background-color: #020617 !important; 
+        background-color: #050C1A !important; 
         border-right: 1px solid rgba(255, 255, 255, 0.05); 
     }
+    
+    .streamlit-expanderHeader {
+        background-color: rgba(0, 242, 96, 0.05) !important;
+        border: 1px solid rgba(0, 242, 96, 0.2);
+        color: #00F260 !important;
+    }
+    .streamlit-expanderHeader svg { display: none !important; }
+    .streamlit-expanderHeader { padding-left: 20px !important; }
     
     /* --- BẢNG DỮ LIỆU --- */
     [data-testid="stDataFrame"] { background: transparent !important; }
     
     /* --- IFRAME BẢN ĐỒ --- */
     iframe {
-        border-radius: 15px;
-        border: 1px solid rgba(51, 255, 187, 0.3);
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        border-radius: 16px;
+        border: 1px solid rgba(0, 242, 96, 0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     </style>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 3. HÀM XỬ LÝ DỮ LIỆU (ĐỌC FILE ZIP)
+# 3. HÀM XỬ LÝ DỮ LIỆU
 # ==========================================
 @st.cache_data
-def load_data(filepath='city_temperatures_clean.zip'): # <--- ĐÃ ĐỔI THÀNH .ZIP
+def load_data(filepath='city_temperatures_clean.zip'): 
     try:
-        # Pandas tự động giải nén file zip nếu bên trong là csv
         df = pd.read_csv(filepath)
     except FileNotFoundError:
         st.error(f"❌ Lỗi: Không tìm thấy file '{filepath}'.")
@@ -141,13 +153,11 @@ def load_data(filepath='city_temperatures_clean.zip'): # <--- ĐÃ ĐỔI THÀNH
              df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
         df = df.dropna(subset=['AvgTemperature', 'Date', 'City'])
         
-        # Chuyển đổi độ F -> C
         if df['AvgTemperature'].mean() > 60:
             df['Temperature_C'] = (df['AvgTemperature'] - 32) * 5/9
         else:
             df['Temperature_C'] = df['AvgTemperature']
             
-        # Việt hóa tên cột
         df = df.rename(columns={
             'Date': 'Ngày',
             'Temperature_C': 'Nhiệt độ (°C)',
@@ -171,7 +181,7 @@ def load_global_data(path='global_temp_series.pkl'):
     except: return None
 
 # KHỞI TẠO
-df = load_data() # Mặc định sẽ load file .zip
+df = load_data()
 model_global = load_model()
 global_data = load_global_data()
 if df.empty: st.stop()
@@ -188,7 +198,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("""
-        <div style='font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        <div style='font-size: 20px; font-weight: 900; background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
@@ -199,7 +209,7 @@ with st.sidebar:
 # ==========================================
 st.markdown(f"""
     <h1>CLIMATE ANALYTICS <span>HUB</span></h1>
-    <p style='font-size: 18px; color: #CBD5E1; margin-top: 5px;'>
+    <p style='font-size: 18px; color: #9CA3AF; margin-top: 5px;'>
         Báo cáo phân tích dữ liệu chuyên sâu cho <strong>{selected_city}</strong>
     </p>
     <br>
@@ -218,7 +228,7 @@ if not city_data.empty:
     if len(chart_data) > 1:
         delta = current_temp - chart_data.iloc[-2]['Nhiệt độ (°C)']
 
-    # KPI Row
+    # KPI Row - Các thẻ này giờ đây có hiệu ứng 3D khi di chuột
     kpi1, kpi2, kpi3 = st.columns(3)
     with kpi1:
         st.metric("Nhiệt độ TB (2020)", f"{current_temp:.1f}°C", f"{delta:.1f}°C vs năm trước")
@@ -230,18 +240,18 @@ if not city_data.empty:
     st.markdown("<br>", unsafe_allow_html=True)
 
     # --- BẢN ĐỒ VỆ TINH ---
-    st.markdown("### 🗺️ Vị trí Địa lý")
+    st.markdown("### Vị trí Địa lý")
     map_url = f"https://maps.google.com/maps?q={selected_city}&t=k&z=11&ie=UTF8&iwloc=&output=embed"
     components.iframe(map_url, height=350, scrolling=False)
     st.markdown("<br>", unsafe_allow_html=True)
 
     # --- BIỂU ĐỒ ---
-    st.markdown("### 📈 Xu hướng Nhiệt độ")
+    st.markdown("### Xu hướng Nhiệt độ")
     
     fig = px.area(
         chart_data, x='Ngày', y='Nhiệt độ (°C)',
         template='plotly_dark',
-        color_discrete_sequence=['#33FFBB']
+        color_discrete_sequence=['#00F260'] # Màu Xanh Ngọc Lục Bảo
     )
     
     fig.update_layout(
@@ -249,7 +259,7 @@ if not city_data.empty:
         plot_bgcolor='rgba(0,0,0,0)',
         font_family="Be Vietnam Pro",
         hovermode="x unified",
-        xaxis=dict(showgrid=False, title=""),
+        xaxis=dict(showgrid=False, title="", showticklabels=True),
         yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)', title="Độ C", zeroline=False),
         margin=dict(l=20, r=20, t=20, b=20),
         height=450
@@ -257,7 +267,7 @@ if not city_data.empty:
     fig.update_traces(fill='tozeroy', line=dict(width=3))
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- BẢNG DỮ LIỆU ---
+    # --- BẢNG DỮ LIỆU (Trong suốt) ---
     with st.expander("Xem bảng dữ liệu chi tiết"):
         st.dataframe(
             city_data[['Ngày', 'Nhiệt độ (°C)']].style.format({"Nhiệt độ (°C)": "{:.2f}"}), 
@@ -277,7 +287,7 @@ with tab1:
         global_viz = global_data.copy()
         global_viz.name = "Nhiệt độ TB (°C)"
         fig_global = px.line(global_viz, template='plotly_dark')
-        fig_global.update_traces(line_color='#00B4FF', line_width=3)
+        fig_global.update_traces(line_color='#0575E6', line_width=3) # Xanh biển sâu
         fig_global.update_layout(
             paper_bgcolor='rgba(15, 23, 42, 0.8)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -307,7 +317,7 @@ with tab2:
             ))
             fig_fc.add_trace(go.Scatter(
                 x=forecast.index, y=forecast['Dự báo'], mode='lines', name='Dự báo AI',
-                line=dict(color='#FF006E', width=3)
+                line=dict(color='#FF0055', width=3)
             ))
             fig_fc.update_layout(
                 template='plotly_dark',
