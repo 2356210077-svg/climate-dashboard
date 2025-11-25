@@ -11,18 +11,19 @@ import streamlit.components.v1 as components
 st.set_page_config(
     layout="wide", 
     page_title="Climate Analytics Hub",
-    page_icon=None,
+    page_icon="🌏",
     initial_sidebar_state="expanded"
 )
 
 # ==========================================
-# 2. CSS "LUXURY TURQUOISE" (FIX LỖI KEYBOARD)
+# 2. CSS TỐI ƯU (CHỈNH FONT CÓ CHỌN LỌC & MÀU SẮC PHẲNG)
 # ==========================================
 st.markdown("""
     <style>
+    /* Import font Be Vietnam Pro */
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;900&display=swap');
 
-    /* --- NỀN TRÁI ĐẤT BAN ĐÊM --- */
+    /* --- 1. NỀN TRÁI ĐẤT BAN ĐÊM (Giao diện tối mặc định) --- */
     [data-testid="stAppViewContainer"] {
         background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop");
         background-size: cover;
@@ -30,128 +31,100 @@ st.markdown("""
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
-    /* Lớp phủ tối (Deep Dark) */
+    /* Lớp phủ tối (90%) */
     [data-testid="stAppViewContainer"]::before {
         content: "";
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(3, 12, 28, 0.92); 
+        background: rgba(2, 6, 15, 0.92); 
         z-index: -1;
     }
 
-    /* --- FONT & TEXT --- */
-    * { font-family: 'Be Vietnam Pro', sans-serif !important; }
-
-    /* --- GRADIENT XANH NGỌC (TURQUOISE GEM) --- */
-    /* Áp dụng cho Tiêu đề, Số liệu lớn, Chữ đậm */
-    h1 span, strong, .gradient-text, h2, h3 {
-        background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); 
+    /* --- 2. TYPOGRAPHY (CHỈ ÁP DỤNG CHO VĂN BẢN CỤ THỂ) --- */
+    /* Thay vì ép toàn bộ (*), ta chỉ ép font cho các thẻ văn bản chính */
+    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stMetricLabel, .stMetricValue, .stDataFrame {
+        font-family: 'Be Vietnam Pro', sans-serif !important;
+        /* Xóa bỏ hoàn toàn hiệu ứng đổ bóng chữ */
+        text-shadow: none !important;
+    }
+    
+    /* --- 3. MÀU SẮC & GRADIENT --- */
+    /* Gradient Xanh Ngọc cho các điểm nhấn và tiêu đề phụ */
+    h1 span, strong, .gradient-text, h2, h3, h4, h5, h6 {
+        background: linear-gradient(90deg, #33FFBB 0%, #00B4FF 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 900 !important;
         letter-spacing: 0.5px;
-        text-shadow: 0 0 30px rgba(0, 242, 96, 0.2);
+        
+        /* Xóa bỏ filter drop-shadow */
+        filter: none !important; 
     }
     
-    /* Chữ thường màu TRẮNG (Không Gradient) */
-    h1 { color: white !important; } /* Phần chữ thường trong H1 */
-    p, div, span, li, label, .stMarkdown { color: #E0E6ED; }
-
-    /* --- 3. KHẮC PHỤC LỖI "KEYBOARD..." (KỸ THUẬT ZERO SIZE) --- */
-    /* Bước 1: Thu nhỏ font của nút về 0 để giấu chữ lỗi */
-    [data-testid="stSidebarCollapsedControl"] {
-        font-size: 0 !important;
-        width: 40px;
-        height: 40px;
+    /* Chữ tiêu đề chính màu trắng (phần không gradient) */
+    h1 { 
+        color: white !important; 
+        text-shadow: none !important;
     }
     
-    /* Bước 2: Vẽ mũi tên mới đè lên bằng pseudo-element */
-    [data-testid="stSidebarCollapsedControl"]::after {
-        content: "➤"; /* Ký tự mũi tên an toàn */
-        font-size: 24px !important; /* Kích thước mũi tên */
-        color: #33FFBB !important; /* Màu xanh Gradient */
-        display: block;
-        text-align: center;
-        line-height: 40px;
-        cursor: pointer;
+    /* Chữ thường màu trắng xám */
+    p, span, div, label, li, .stCaption {
+        color: #E0E6ED;
     }
 
-    /* Ẩn icon lỗi trong Expander */
-    .streamlit-expanderHeader svg { display: none !important; }
-    .streamlit-expanderHeader { padding-left: 1rem !important; }
-
-    /* --- 4. GIAO DIỆN BẢNG DỮ LIỆU (DATAFRAME) --- */
-    /* Làm trong suốt nền bảng và chỉnh màu chữ trắng */
-    [data-testid="stDataFrame"], [data-testid="stTable"] {
-        background-color: transparent !important;
-    }
-    /* Chỉnh màu chữ trong bảng thành trắng */
-    div[data-testid="stDataFrame"] div {
-        color: white !important;
-        background-color: rgba(255, 255, 255, 0.02) !important; /* Nền dòng cực mờ */
-    }
-    /* Header của bảng */
-    div[data-testid="stDataFrame"] div[role="columnheader"] {
-        color: #33FFBB !important; /* Màu xanh cho tiêu đề cột */
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        font-weight: bold;
-    }
-
-    /* --- CARD KPI (HIỆU ỨNG 3D CHIỀU SÂU) --- */
+    /* --- 4. GIAO DIỆN CÁC THÀNH PHẦN --- */
+    
+    /* Metric Card (KPI) */
     div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-left: 3px solid #00F260; /* Điểm nhấn xanh ngọc bên trái */
-        border-radius: 16px;
-        padding: 15px 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(51, 255, 187, 0.3);
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         backdrop-filter: blur(10px);
+        transition: transform 0.2s;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        border-color: #33FFBB;
+        box-shadow: 0 10px 20px rgba(51, 255, 187, 0.2);
     }
     
-    /* Hiệu ứng khi di chuột (Hover): Nổi lên & Phát sáng */
-    div[data-testid="stMetric"]:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 242, 96, 0.15);
-        border-color: rgba(0, 242, 96, 0.5);
-        background: rgba(255, 255, 255, 0.06);
-        cursor: pointer;
-    }
-
-    div[data-testid="stMetricLabel"] { 
-        color: #9CA3AF !important; 
-        font-size: 13px !important; 
-        text-transform: uppercase; 
-        letter-spacing: 1.5px;
-        font-weight: 600;
-    }
+    /* Màu chữ trong KPI */
+    div[data-testid="stMetricLabel"] { color: #9CA3AF !important; }
     div[data-testid="stMetricValue"] { 
-        font-size: 42px !important; 
-        font-weight: 800;
+        font-size: 40px !important; 
+        font-weight: 800; 
         color: #FFFFFF !important;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        text-shadow: none !important; /* Xóa bóng chữ số */
     }
 
-    /* --- SIDEBAR & EXPANDER --- */
+    /* Sidebar */
     [data-testid="stSidebar"] { 
-        background-color: #050C1A !important; 
+        background-color: #020617 !important; 
         border-right: 1px solid rgba(255, 255, 255, 0.05); 
     }
     
-    .streamlit-expanderHeader {
-        background-color: rgba(0, 242, 96, 0.05) !important;
-        border: 1px solid rgba(0, 242, 96, 0.2);
-        color: #00F260 !important;
-    }
-    
-    /* --- BẢNG DỮ LIỆU --- */
+    /* Bảng dữ liệu trong suốt */
     [data-testid="stDataFrame"] { background: transparent !important; }
-    
-    /* --- IFRAME BẢN ĐỒ --- */
-    iframe {
-        border-radius: 16px;
-        border: 1px solid rgba(0, 242, 96, 0.3);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    div[data-testid="stDataFrame"] div {
+        background-color: transparent !important;
+        color: white !important;
     }
+    
+    /* Expander & Iframe */
+    .streamlit-expanderHeader {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(51, 255, 187, 0.3);
+        color: #33FFBB !important;
+        border-radius: 8px;
+    }
+    iframe {
+        border-radius: 15px;
+        border: 1px solid rgba(51, 255, 187, 0.3);
+    }
+    
+    /* --- QUAN TRỌNG: KHÔNG CÓ CODE "HACK" ICON Ở ĐÂY --- */
+    /* Chúng ta để Streamlit tự quản lý icon, nó sẽ hiển thị đúng mũi tên mặc định */
     </style>
     """, unsafe_allow_html=True)
 
@@ -198,10 +171,20 @@ def load_global_data(path='global_temp_series.pkl'):
         return data.resample('ME').mean()
     except: return None
 
+# HÀM BẢN ĐỒ
+@st.cache_data
+def prepare_map_data(df):
+    map_df = df.copy()
+    map_df['Năm'] = map_df['Ngày'].dt.year
+    map_data = map_df.groupby(['Quốc gia', 'Năm'])['Nhiệt độ (°C)'].mean().reset_index()
+    return map_data.sort_values('Năm')
+
 # KHỞI TẠO
 df = load_data()
 model_global = load_model()
 global_data = load_global_data()
+map_data = prepare_map_data(df) 
+
 if df.empty: st.stop()
 
 unique_cities = sorted(df['Thành phố'].unique())
@@ -215,24 +198,20 @@ with st.sidebar:
     st.caption("Thao tác: Di chuột vào biểu đồ để xem chi tiết.")
     
     st.markdown("---")
-    
-    # --- ĐOẠN CODE ĐÃ SỬA THEO YÊU CẦU CỦA BẠN ---
     st.markdown("""
-        <div style='font-size: 20px; font-weight: 900; background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        <div style='font-size: 20px; font-weight: 900; background: linear-gradient(135deg, #00F260 0%, #0575E6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;'>
         USSH.3CE TEAM
         </div>
     """, unsafe_allow_html=True)
-    # ---------------------------------------------
-    
-    st.caption("Dự án Phân tích Dữ liệu cho Quản lý 2025")
+    st.caption("Dự án Phân tích Dữ liệu Quản lý 2025")
 
 # ==========================================
 # 5. UI: HEADER CHÍNH
 # ==========================================
 st.markdown(f"""
-    <h1>CLIMATE ANALYTICS <span>HUB</span></h1>
-    <p style='font-size: 18px; color: #9CA3AF; margin-top: 5px;'>
-        Báo cáo phân tích dữ liệu chuyên sâu cho <strong>{selected_city}</strong>
+    <h1>CLIMATE ANALYTICS <span class='gradient-text'>HUB</span></h1>
+    <p style='font-size: 18px; color: #CBD5E1; margin-top: 5px;'>
+        Báo cáo phân tích dữ liệu chuyên sâu cho <strong class='gradient-text'>{selected_city}</strong>
     </p>
     <br>
 """, unsafe_allow_html=True)
@@ -273,7 +252,7 @@ if not city_data.empty:
     fig = px.area(
         chart_data, x='Ngày', y='Nhiệt độ (°C)',
         template='plotly_dark',
-        color_discrete_sequence=['#00F260'] # Xanh Ngọc
+        color_discrete_sequence=['#33FFBB'] 
     )
     
     fig.update_layout(
@@ -286,7 +265,12 @@ if not city_data.empty:
         margin=dict(l=20, r=20, t=20, b=20),
         height=450
     )
-    fig.update_traces(fill='tozeroy', line=dict(width=3))
+    # Cập nhật hiển thị Tooltip chuyên nghiệp hơn
+    fig.update_traces(
+        fill='tozeroy', 
+        line=dict(width=3),
+        hovertemplate="<b>Năm:</b> %{x|%Y}<br><b>Nhiệt độ:</b> %{y:.2f}°C<extra></extra>"
+    )
     st.plotly_chart(fig, use_container_width=True)
 
     # --- BẢNG DỮ LIỆU ---
@@ -297,19 +281,64 @@ if not city_data.empty:
         )
 
 # ==========================================
-# 7. PHẦN DỰ BÁO
+# 7. PHẦN DỰ BÁO & BẢN ĐỒ TOÀN CẦU
 # ==========================================
 st.markdown("---")
 st.markdown("## 🔮 Phân tích & Dự báo AI")
 
-tab1, tab2 = st.tabs(["Dữ liệu Lịch sử", "Mô hình Dự báo"])
+tab1, tab2 = st.tabs(["Dữ liệu Lịch sử & Bản đồ", "Mô hình Dự báo"])
 
 with tab1:
+    st.markdown("### 🌍 Bản đồ nhiệt Timelapse: Nhiệt độ Trung bình Toàn cầu")
+    st.caption("Nhấn nút **Play (►)** bên dưới để xem sự thay đổi nhiệt độ qua các năm.")
+    
+    if not map_data.empty:
+        fig_map = px.choropleth(
+            map_data,
+            locations="Quốc gia",
+            locationmode="country names",
+            color="Nhiệt độ (°C)",
+            hover_name="Quốc gia",
+            animation_frame="Năm", 
+            color_continuous_scale=px.colors.sequential.YlOrRd, 
+            range_color=[-10, 30], 
+            template='plotly_dark'
+        )
+        
+        fig_map.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            geo=dict(
+                bgcolor='rgba(0,0,0,0)',
+                showlakes=True, 
+                lakecolor='rgba(0,0,0,0.2)',
+                showocean=True,
+                oceancolor='rgba(0, 20, 40, 0.5)',
+                projection_type='natural earth' 
+            ),
+            font_family="Be Vietnam Pro",
+            margin=dict(l=0, r=0, t=0, b=0),
+            height=500
+        )
+        # Cập nhật tooltip cho bản đồ
+        fig_map.update_traces(
+            hovertemplate="<b>%{hovertext}</b><br>Nhiệt độ: %{z:.2f}°C<extra></extra>"
+        )
+        st.plotly_chart(fig_map, use_container_width=True)
+    else:
+        st.info("Đang tải dữ liệu bản đồ...")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     if global_data is not None:
+        st.markdown("### 📉 Xu hướng Nhiệt độ Toàn cầu (1995-2020)")
         global_viz = global_data.copy()
-        global_viz.name = "Nhiệt độ TB (°C)"
+        global_viz.name = "Nhiệt độ Trung bình (°C)"
         fig_global = px.line(global_viz, template='plotly_dark')
-        fig_global.update_traces(line_color='#0575E6', line_width=3)
+        fig_global.update_traces(
+            line_color='#00B4FF', 
+            line_width=3,
+            hovertemplate="<b>Thời gian:</b> %{x|%m/%Y}<br><b>Nhiệt độ Trung bình:</b> %{y:.2f}°C<extra></extra>"
+        )
         fig_global.update_layout(
             paper_bgcolor='rgba(15, 23, 42, 0.8)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -335,11 +364,13 @@ with tab2:
             fig_fc = go.Figure()
             fig_fc.add_trace(go.Scatter(
                 x=global_data.index, y=y_hist, mode='lines', name='Lịch sử',
-                line=dict(color='rgba(255, 255, 255, 0.3)', width=2)
+                line=dict(color='rgba(255, 255, 255, 0.3)', width=2),
+                hovertemplate="<b>Ngày:</b> %{x|%m/%Y}<br><b>Lịch sử:</b> %{y:.2f}°C<extra></extra>"
             ))
             fig_fc.add_trace(go.Scatter(
                 x=forecast.index, y=forecast['Dự báo'], mode='lines', name='Dự báo AI',
-                line=dict(color='#FF0055', width=3)
+                line=dict(color='#FF0055', width=3),
+                hovertemplate="<b>Ngày:</b> %{x|%m/%Y}<br><b>Dự báo:</b> %{y:.2f}°C<extra></extra>"
             ))
             fig_fc.update_layout(
                 template='plotly_dark',
@@ -353,5 +384,3 @@ with tab2:
             st.plotly_chart(fig_fc, use_container_width=True)
     else:
         st.warning("⚠️ Chưa tải được dữ liệu dự báo.")
-
-
