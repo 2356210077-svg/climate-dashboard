@@ -1,18 +1,20 @@
 [theme]
-# Theme Tối (Dark) - Sang trọng, hiện đại
+# Bắt buộc chế độ tối
 base="dark"
 
-# Màu chính: Xanh Mòng Két phát sáng (Electric Teal) - Tạo điểm nhấn công nghệ
-primaryColor="#00F4B0"
+# Màu chính (Primary Color): Dùng cho các nút bấm, thanh trượt, viền focus
+# Lấy mã màu Xanh Ngọc Sáng từ gradient của bạn (#33FFBB)
+primaryColor="#33FFBB"
 
-# Màu nền chính: Xanh Navy Cực Đậm - Tạo chiều sâu
-backgroundColor="#0a192f"
+# Màu nền chính (Background Color):
+# Dùng màu tối đậm trùng với màu nền sidebar để đồng bộ khi ảnh nền chưa kịp tải
+backgroundColor="#020617"
 
-# Màu nền phụ (Sidebar, Card): Xanh Navy nhạt hơn
-secondaryBackgroundColor="#172a45"
+# Màu nền phụ (Secondary Background): Dùng cho Sidebar và các thẻ input
+secondaryBackgroundColor="#0F172A"
 
-# Màu chữ: Trắng ngà - Dễ đọc, không chói
-textColor="#FAFAFA"
+# Màu chữ (Text Color): Màu trắng xám dịu mắt
+textColor="#E0E6ED"
 
-# Font chữ: Sans serif (Sạch sẽ, khớp với font Lato đã nhúng trong app.py)
+# Font chữ mặc định
 font="sans serif"
